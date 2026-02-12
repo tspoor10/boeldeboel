@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>De Boel de Boel Tocht - Den Bosch Pub Crawl</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Fredoka:wght@400;600;700&display=swap');
 
@@ -29,6 +27,7 @@
             justify-content: center;
             height: 100vh;
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            z-index: 1000;
         }
         
         .login-box {
@@ -42,14 +41,8 @@
         }
         
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .login-box h1 {
@@ -75,7 +68,6 @@
             border-radius: 8px;
             font-size: 16px;
             font-family: 'Fredoka', sans-serif;
-            box-sizing: border-box;
             background: rgba(255,255,255,0.9);
         }
         
@@ -106,10 +98,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         
-        .login-box button:active {
-            transform: translateY(0);
-        }
-        
         .error-message {
             color: #fff;
             background: rgba(0,0,0,0.3);
@@ -120,7 +108,7 @@
             font-size: 14px;
         }
         
-        #app {
+        .login-container.hidden {
             display: none;
         }
         
@@ -141,18 +129,6 @@
             border-bottom: 4px solid #FFD700;
             position: relative;
             overflow: hidden;
-        }
-        
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 80%, rgba(255,215,0,0.1) 0%, transparent 50%);
-            pointer-events: none;
         }
         
         .header-content {
@@ -184,36 +160,6 @@
             width: 0%;
         }
         
-        .carnival-figure {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .carnival-figure.left {
-            left: 15px;
-            animation: dance-left 2s infinite ease-in-out;
-        }
-        
-        .carnival-figure.right {
-            right: 15px;
-            animation: dance-right 2s infinite ease-in-out;
-        }
-        
-        @keyframes dance-left {
-            0%, 100% { transform: translateY(-50%) rotateZ(-3deg); }
-            50% { transform: translateY(-60px) rotateZ(3deg); }
-        }
-        
-        @keyframes dance-right {
-            0%, 100% { transform: translateY(-50%) rotateZ(3deg); }
-            50% { transform: translateY(-60px) rotateZ(-3deg); }
-        }
-        
         .content {
             display: flex;
             flex: 1;
@@ -223,8 +169,8 @@
         
         #map {
             flex: 1;
-            height: 100%;
             background: #e8eef5;
+            min-height: 300px;
         }
         
         .sidebar {
@@ -282,23 +228,6 @@
             min-height: 0;
         }
         
-        .legend-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        
-        .legend-container::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-        
-        .legend-container::-webkit-scrollbar-thumb {
-            background: #C41E3A;
-            border-radius: 3px;
-        }
-        
-        .legend-container::-webkit-scrollbar-thumb:hover {
-            background: #a01729;
-        }
-        
         .area-group {
             margin-bottom: 25px;
         }
@@ -328,40 +257,10 @@
             flex-shrink: 0;
         }
         
-        .area-name.red {
-            background: linear-gradient(135deg, #E63946 0%, #C41E3A 100%);
-        }
-        
-        .area-name.white {
-            background: linear-gradient(135deg, #555555 0%, #333333 100%);
-        }
-        
-        .area-name.yellow {
-            background: linear-gradient(135deg, #F4A460 0%, #FF8C42 100%);
-        }
-        
-        .area-name.green {
-            background: linear-gradient(135deg, #32CD32 0%, #228B22 100%);
-        }
-        
-        .pub-item.green {
-            border-left-color: #32CD32;
-        }
-        
-        .pub-item.green::before {
-            background: #32CD32;
-        }
-        
-        .bonus-label {
-            font-family: 'Fredoka One', cursive;
-            font-size: 11px;
-            color: #999;
-            margin-top: 15px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            font-weight: 700;
-        }
+        .area-name.red { background: linear-gradient(135deg, #E63946 0%, #C41E3A 100%); }
+        .area-name.white { background: linear-gradient(135deg, #555555 0%, #333333 100%); }
+        .area-name.yellow { background: linear-gradient(135deg, #F4A460 0%, #FF8C42 100%); }
+        .area-name.green { background: linear-gradient(135deg, #32CD32 0%, #228B22 100%); }
         
         .pub-item {
             padding: 12px 14px;
@@ -370,66 +269,27 @@
             border-radius: 6px;
             font-size: 13px;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition: all 0.3s;
             background: rgba(0,0,0,0.03);
             display: flex;
             align-items: center;
             gap: 10px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .pub-item::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 4px;
-            height: 100%;
-            transform: scaleY(0);
-            transform-origin: top;
-            transition: transform 0.3s ease;
         }
         
         .pub-item:hover {
             transform: translateX(6px);
             background: rgba(0,0,0,0.06);
-            font-weight: 600;
         }
         
-        .pub-item.red {
-            border-left-color: #E63946;
-        }
-        
-        .pub-item.red::before {
-            background: #E63946;
-        }
-        
-        .pub-item.white {
-            border-left-color: #333;
-        }
-        
-        .pub-item.white::before {
-            background: #333;
-        }
-        
-        .pub-item.yellow {
-            border-left-color: #F4A460;
-        }
-        
-        .pub-item.yellow::before {
-            background: #F4A460;
-        }
+        .pub-item.red { border-left-color: #E63946; }
+        .pub-item.white { border-left-color: #333; }
+        .pub-item.yellow { border-left-color: #F4A460; }
+        .pub-item.green { border-left-color: #32CD32; }
         
         .pub-item.completed {
             background: rgba(76, 175, 80, 0.1);
             border-left-color: #4CAF50;
             opacity: 0.7;
-        }
-        
-        .pub-item.completed::before {
-            background: #4CAF50;
-            transform: scaleY(1);
         }
         
         .pub-number {
@@ -443,33 +303,15 @@
             font-size: 12px;
             font-weight: 700;
             flex-shrink: 0;
-            color: inherit;
         }
         
-        .pub-item.red .pub-number {
-            color: #E63946;
-        }
+        .pub-item.red .pub-number { color: #E63946; }
+        .pub-item.white .pub-number { color: #333; }
+        .pub-item.yellow .pub-number { color: #F4A460; }
+        .pub-item.green .pub-number { color: #32CD32; }
+        .pub-item.completed .pub-number { background: #4CAF50; color: white; }
         
-        .pub-item.white .pub-number {
-            color: #333;
-        }
-        
-        .pub-item.yellow .pub-number {
-            color: #F4A460;
-        }
-        
-        .pub-item.green .pub-number {
-            color: #32CD32;
-        }
-        
-        .pub-item.completed .pub-number {
-            background: #4CAF50;
-            color: white;
-        }
-        
-        .pub-name {
-            flex: 1;
-        }
+        .pub-name { flex: 1; }
         
         .checkbox {
             width: 20px;
@@ -481,124 +323,14 @@
             justify-content: center;
             font-size: 12px;
             font-weight: bold;
-            transition: all 0.2s;
             color: #999;
             flex-shrink: 0;
-        }
-        
-        .pub-item:hover .checkbox {
-            color: #666;
-            background: rgba(0,0,0,0.05);
         }
         
         .pub-item.completed .checkbox {
             background: #4CAF50;
             color: white;
             border-color: #4CAF50;
-        }
-        
-        .custom-icon {
-            background: none !important;
-            border: none !important;
-        }
-        
-        .leaflet-popup {
-            font-family: 'Fredoka', sans-serif;
-        }
-        
-        .leaflet-popup-content {
-            margin: 12px;
-            font-size: 13px;
-        }
-        
-        .leaflet-popup-content h3 {
-            margin: 0 0 8px 0;
-            font-size: 16px;
-            font-family: 'Fredoka One', cursive;
-        }
-        
-        .leaflet-popup-content h3.red {
-            color: #E63946;
-        }
-        
-        .leaflet-popup-content h3.white {
-            color: #333;
-        }
-        
-        .leaflet-popup-content h3.yellow {
-            color: #F4A460;
-        }
-        
-        .leaflet-popup-content h3.green {
-            color: #32CD32;
-        }
-        
-        .leaflet-popup-content p {
-            margin: 4px 0;
-            color: #666;
-        }
-        
-        .popup-area {
-            font-weight: 600;
-            font-size: 14px;
-        }
-        
-        .popup-area.red {
-            color: #E63946;
-        }
-        
-        .popup-area.white {
-            color: #333;
-        }
-        
-        .popup-area.yellow {
-            color: #F4A460;
-        }
-        
-        .popup-area.green {
-            color: #32CD32;
-        }
-        
-        .popup-status {
-            font-weight: 600;
-        }
-        
-        .popup-status.completed {
-            color: #4CAF50;
-        }
-        
-        .popup-status.not-visited {
-            color: #F44336;
-        }
-        
-        .popup-checkbox {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #ddd;
-        }
-        
-        .popup-checkbox button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-        }
-        
-        .popup-checkbox button:hover {
-            background: #45a049;
-            transform: scale(1.05);
-        }
-        
-        .popup-checkbox button.undo {
-            background: #f44336;
-        }
-        
-        .popup-checkbox button.undo:hover {
-            background: #da190b;
         }
         
         .reset-button {
@@ -610,31 +342,20 @@
             border-radius: 6px;
             cursor: pointer;
             font-weight: 600;
-            transition: all 0.3s;
             font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
-        
-        .reset-button:hover {
-            background: #da190b;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
-        }
-        
+
         @media (max-width: 768px) {
-            .content {
-                flex-direction: column;
-            }
-            .sidebar {
-                width: 100%;
-                max-height: 35%;
-                border-left: none;
-                border-top: 3px solid #C41E3A;
-            }
-            .header h1 {
-                font-size: 28px;
-            }
+            .content { flex-direction: column; }
+            .sidebar { width: 100%; max-height: 35%; }
+        }
+        
+        /* Hide default Leaflet marker styling */
+        .leaflet-marker-icon {
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
         }
     </style>
 </head>
@@ -651,20 +372,12 @@
     </div>
 
     <!-- Main App -->
-    <div id="app">
-    <div class="container">
+    <div class="container" id="app" style="display: none;">
         <div class="header">
-            <!-- Left Carnival Logo -->
-            <div class="carnival-figure left">🎭</div>
-
             <div class="header-content">
                 <h1>🍺 De Boel de Boel Tocht 🍺</h1>
                 <p class="header-subtitle">Den Bosch Pub Crawl Tracker 2026</p>
             </div>
-
-            <!-- Right Carnival Logo -->
-            <div class="carnival-figure right">🎪</div>
-            
             <div class="progress-bar"></div>
         </div>
         
@@ -690,113 +403,41 @@
                     </div>
                 </div>
                 
-                <div class="legend-container">
+                <div class="legend-container" id="legendContainer">
                     <div class="area-group">
                         <div class="area-name red">🔴 Red Area</div>
-                        <div class="pub-item red" data-id="1">
-                            <div class="pub-number">1</div>
-                            <div class="pub-name">Reinders</div>
-                            <div class="checkbox">✓</div>
-                        </div>
-                        <div class="pub-item red" data-id="2">
-                            <div class="pub-number">2</div>
-                            <div class="pub-name">Het Veulen</div>
-                            <div class="checkbox">✓</div>
-                        </div>
-                        <div class="pub-item red" data-id="3">
-                            <div class="pub-number">3</div>
-                            <div class="pub-name">Bar 35</div>
-                            <div class="checkbox">✓</div>
-                        </div>
-                        <div class="pub-item red" data-id="4">
-                            <div class="pub-number">4</div>
-                            <div class="pub-name">Dit</div>
-                            <div class="checkbox">✓</div>
-                        </div>
+                        <div class="pub-item red" data-id="1"><div class="pub-number">1</div><div class="pub-name">Reinders</div><div class="checkbox">✓</div></div>
+                        <div class="pub-item red" data-id="2"><div class="pub-number">2</div><div class="pub-name">Het Veulen</div><div class="checkbox">✓</div></div>
+                        <div class="pub-item red" data-id="3"><div class="pub-number">3</div><div class="pub-name">Bar 35</div><div class="checkbox">✓</div></div>
+                        <div class="pub-item red" data-id="4"><div class="pub-number">4</div><div class="pub-name">Dit</div><div class="checkbox">✓</div></div>
                     </div>
                     
                     <div class="area-group">
                         <div class="area-name white">⚪ White Area</div>
-                        <div class="pub-item white" data-id="5">
-                            <div class="pub-number">5</div>
-                            <div class="pub-name">Jheronimus</div>
-                            <div class="checkbox">✓</div>
-                        </div>
-                        <div class="pub-item white" data-id="6">
-                            <div class="pub-number">6</div>
-                            <div class="pub-name">Plaats Royaal</div>
-                            <div class="checkbox">✓</div>
-                        </div>
+                        <div class="pub-item white" data-id="5"><div class="pub-number">5</div><div class="pub-name">Jheronimus</div><div class="checkbox">✓</div></div>
+                        <div class="pub-item white" data-id="6"><div class="pub-number">6</div><div class="pub-name">Plaats Royaal</div><div class="checkbox">✓</div></div>
                     </div>
                     
                     <div class="area-group">
                         <div class="area-name yellow">🟡 Yellow Area</div>
-                        <div class="pub-item yellow" data-id="7">
-                            <div class="pub-number">7</div>
-                            <div class="pub-name">Bar Boas</div>
-                            <div class="checkbox">✓</div>
-                        </div>
-                        <div class="pub-item yellow" data-id="8">
-                            <div class="pub-number">8</div>
-                            <div class="pub-name">Bij Dirk</div>
-                            <div class="checkbox">✓</div>
-                        </div>
-                        <div class="pub-item yellow" data-id="9">
-                            <div class="pub-number">9</div>
-                            <div class="pub-name">Eetbar de Stadt</div>
-                            <div class="checkbox">✓</div>
-                        </div>
-                        <div class="pub-item yellow" data-id="10">
-                            <div class="pub-number">10</div>
-                            <div class="pub-name">Pantoffeltje</div>
-                            <div class="checkbox">✓</div>
-                        </div>
-                        <div class="pub-item yellow" data-id="11">
-                            <div class="pub-number">11</div>
-                            <div class="pub-name">Het Hart</div>
-                            <div class="checkbox">✓</div>
-                        </div>
-                        <div class="pub-item yellow" data-id="12">
-                            <div class="pub-number">12</div>
-                            <div class="pub-name">Bonte Pallet</div>
-                            <div class="checkbox">✓</div>
-                        </div>
-                        <div class="pub-item yellow" data-id="13">
-                            <div class="pub-number">13</div>
-                            <div class="pub-name">Baron's Lodge</div>
-                            <div class="checkbox">✓</div>
-                        </div>
+                        <div class="pub-item yellow" data-id="7"><div class="pub-number">7</div><div class="pub-name">Bar Boas</div><div class="checkbox">✓</div></div>
+                        <div class="pub-item yellow" data-id="8"><div class="pub-number">8</div><div class="pub-name">Bij Dirk</div><div class="checkbox">✓</div></div>
+                        <div class="pub-item yellow" data-id="9"><div class="pub-number">9</div><div class="pub-name">Eetbar de Stadt</div><div class="checkbox">✓</div></div>
+                        <div class="pub-item yellow" data-id="10"><div class="pub-number">10</div><div class="pub-name">Pantoffeltje</div><div class="checkbox">✓</div></div>
+                        <div class="pub-item yellow" data-id="11"><div class="pub-number">11</div><div class="pub-name">Het Hart</div><div class="checkbox">✓</div></div>
+                        <div class="pub-item yellow" data-id="12"><div class="pub-number">12</div><div class="pub-name">Bonte Pallet</div><div class="checkbox">✓</div></div>
+                        <div class="pub-item yellow" data-id="13"><div class="pub-number">13</div><div class="pub-name">Baron's Lodge</div><div class="checkbox">✓</div></div>
                     </div>
                     
-                    <div class="bonus-label">🌟 Bonus Pubs (Optional)</div>
+                    <div style="font-family: 'Fredoka One'; font-size: 11px; color: #999; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">🌟 Bonus Pubs (Optional)</div>
                     
                     <div class="area-group">
                         <div class="area-name green">💚 Outsiders</div>
-                        <div class="pub-item green" data-id="14">
-                            <div class="pub-number">★</div>
-                            <div class="pub-name">O'Mearas Irish Pub</div>
-                            <div class="checkbox">✓</div>
-                        </div>
-                        <div class="pub-item green" data-id="15">
-                            <div class="pub-number">★</div>
-                            <div class="pub-name">Café de Palm</div>
-                            <div class="checkbox">✓</div>
-                        </div>
-                        <div class="pub-item green" data-id="16">
-                            <div class="pub-number">★</div>
-                            <div class="pub-name">De Raadskelder</div>
-                            <div class="checkbox">✓</div>
-                        </div>
-                        <div class="pub-item green" data-id="17">
-                            <div class="pub-number">★</div>
-                            <div class="pub-name">Hello my Friend!</div>
-                            <div class="checkbox">✓</div>
-                        </div>
-                        <div class="pub-item green" data-id="18">
-                            <div class="pub-number">★</div>
-                            <div class="pub-name">Paternoster</div>
-                            <div class="checkbox">✓</div>
-                        </div>
+                        <div class="pub-item green" data-id="14"><div class="pub-number">★</div><div class="pub-name">O'Mearas Irish Pub</div><div class="checkbox">✓</div></div>
+                        <div class="pub-item green" data-id="15"><div class="pub-number">★</div><div class="pub-name">Café de Palm</div><div class="checkbox">✓</div></div>
+                        <div class="pub-item green" data-id="16"><div class="pub-number">★</div><div class="pub-name">De Raadskelder</div><div class="checkbox">✓</div></div>
+                        <div class="pub-item green" data-id="17"><div class="pub-number">★</div><div class="pub-name">Hello my Friend!</div><div class="checkbox">✓</div></div>
+                        <div class="pub-item green" data-id="18"><div class="pub-number">★</div><div class="pub-name">Paternoster</div><div class="checkbox">✓</div></div>
                     </div>
                 </div>
                 
@@ -805,237 +446,10 @@
         </div>
     </div>
 
-    <script>
-        const map = L.map('map').setView([51.6884, 5.3048], 15);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '© OpenStreetMap contributors',
-            maxZoom: 19,
-            opacity: 0.9
-        }).addTo(map);
-
-        const pubs = [
-            { id: 1, name: 'Reinders', lat: 51.689658892634846, lng: 5.300710010940677, area: 'red', color: '#E63946', required: true },
-            { id: 2, name: 'Het Veulen', lat: 51.68977209647595, lng: 5.300141446566025, area: 'red', color: '#E63946', required: true },
-            { id: 3, name: 'Bar 35', lat: 51.689901550279856, lng: 5.299624028090119, area: 'red', color: '#E63946', required: true },
-            { id: 4, name: 'Dit', lat: 51.68832490600335, lng: 5.301377522075502, area: 'red', color: '#E63946', required: true },
-            { id: 5, name: 'Jheronimus', lat: 51.68890144131806, lng: 5.303285633408725, area: 'white', color: '#555555', required: true },
-            { id: 6, name: 'Plaats Royaal', lat: 51.688007195275574, lng: 5.303759927835246, area: 'white', color: '#555555', required: true },
-            { id: 7, name: 'Bar Boas', lat: 51.68770346620766, lng: 5.30731419542771, area: 'yellow', color: '#F4A460', required: true },
-            { id: 8, name: 'Bij Dirk', lat: 51.68643255969921, lng: 5.305761098615981, area: 'yellow', color: '#F4A460', required: true },
-            { id: 9, name: 'Eetbar de Stadt', lat: 51.68703937186069, lng: 5.305199444249146, area: 'yellow', color: '#F4A460', required: true },
-            { id: 10, name: 'Pantoffeltje', lat: 51.68761537096449, lng: 5.305789351736798, area: 'yellow', color: '#F4A460', required: true },
-            { id: 11, name: 'Het Hart', lat: 51.68777044650596, lng: 5.307282186244409, area: 'yellow', color: '#F4A460', required: true },
-            { id: 12, name: 'Bonte Pallet', lat: 51.6887586929537, lng: 5.308105723090129, area: 'yellow', color: '#F4A460', required: true },
-            { id: 13, name: 'Baron\'s Lodge', lat: 51.6871376862583, lng: 5.305960825286391, area: 'yellow', color: '#F4A460', required: true },
-            { id: 14, name: 'O\'Mearas Irish Pub', lat: 51.68889799946857, lng: 5.301137668484566, area: 'green', color: '#32CD32', required: false },
-            { id: 15, name: 'Café de Palm', lat: 51.68878809199506, lng: 5.309014070013813, area: 'green', color: '#32CD32', required: false },
-            { id: 16, name: 'De Raadskelder', lat: 51.688507325839424, lng: 5.303281077607486, area: 'green', color: '#32CD32', required: false },
-            { id: 17, name: 'Hello my Friend!', lat: 51.689839348996884, lng: 5.3007707436085205, area: 'green', color: '#32CD32', required: false },
-            { id: 18, name: 'Paternoster', lat: 51.68906730633433, lng: 5.303330878792206, area: 'green', color: '#32CD32', required: false }
-        ];
-
-        // Load completed pubs from localStorage
-        let completed = JSON.parse(localStorage.getItem('boelBoelCompleted')) || [];
-
-        function createIcon(pub) {
-            const isCompleted = completed.includes(pub.id);
-            const bgColor = isCompleted ? '#4CAF50' : pub.color;
-            const icon = isCompleted ? '✓' : pub.id;
-            
-            return L.divIcon({
-                html: `<div style="background-color: ${bgColor}; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 3px solid white; box-shadow: 0 3px 12px rgba(0,0,0,0.3); cursor: pointer; transition: all 0.2s; font-family: 'Fredoka One';">${icon}</div>`,
-                iconSize: [40, 40],
-                className: 'custom-icon'
-            });
-        }
-
-        const markers = {};
-
-        pubs.forEach((pub) => {
-            const marker = L.marker([pub.lat, pub.lng], { icon: createIcon(pub) }).addTo(map);
-            markers[pub.id] = marker;
-
-            const isCompleted = completed.includes(pub.id);
-            
-            marker.bindPopup(`
-                <div>
-                    <h3 class="${pub.area}">${pub.id}. ${pub.name}</h3>
-                    <p><strong>Area:</strong> <span class="popup-area ${pub.area}">${pub.area.toUpperCase()}</span></p>
-                    <p><strong>Status:</strong> <span class="popup-status ${isCompleted ? 'completed' : 'not-visited'}">${isCompleted ? '✓ Completed' : 'Not visited'}</span></p>
-                    <div class="popup-checkbox">
-                        <button id="marker-btn-${pub.id}" onclick="togglePub(${pub.id}, true)" style="width: 100%;">
-                            ${isCompleted ? '↻ Mark as Unvisited' : '✓ Mark as Complete'}
-                        </button>
-                    </div>
-                </div>
-            `);
-
-            marker.on('click', () => {
-                marker.openPopup();
-            });
-        });
-
-        function togglePub(id, fromMarker = false) {
-            const index = completed.indexOf(id);
-            
-            if (index > -1) {
-                completed.splice(index, 1);
-            } else {
-                completed.push(id);
-            }
-            
-            localStorage.setItem('boelBoelCompleted', JSON.stringify(completed));
-            updateUI();
-
-            if (fromMarker) {
-                const marker = markers[id];
-                const pub = pubs.find(p => p.id === id);
-                const isCompleted = completed.includes(id);
-                
-                // Update popup content
-                marker.setPopupContent(`
-                    <div>
-                        <h3 class="${pub.area}">${pub.id}. ${pub.name}</h3>
-                        <p><strong>Area:</strong> <span class="popup-area ${pub.area}">${pub.area.toUpperCase()}</span></p>
-                        <p><strong>Status:</strong> <span class="popup-status ${isCompleted ? 'completed' : 'not-visited'}">${isCompleted ? '✓ Completed' : 'Not visited'}</span></p>
-                        <div class="popup-checkbox">
-                            <button id="marker-btn-${pub.id}" onclick="togglePub(${pub.id}, true)" style="width: 100%;">
-                                ${isCompleted ? '↻ Mark as Unvisited' : '✓ Mark as Complete'}
-                            </button>
-                        </div>
-                    </div>
-                `);
-                
-                marker.setIcon(createIcon(pub));
-                setTimeout(() => marker.openPopup(), 100);
-            }
-        }
-
-        function updateUI() {
-            const requiredPubs = pubs.filter(p => p.required);
-            const bonusPubs = pubs.filter(p => !p.required);
-            
-            const requiredCompleted = completed.filter(id => {
-                const pub = pubs.find(p => p.id === id);
-                return pub && pub.required;
-            }).length;
-            
-            const bonusCompleted = completed.filter(id => {
-                const pub = pubs.find(p => p.id === id);
-                return pub && !pub.required;
-            }).length;
-            
-            const completedCount = requiredCompleted + bonusCompleted;
-            const remainingCount = requiredPubs.length - requiredCompleted;
-            const percentage = Math.round((requiredCompleted / requiredPubs.length) * 100);
-            
-            // Display format: completed/required + bonus
-            let displayText = `${requiredCompleted}/${requiredPubs.length}`;
-            if (bonusCompleted > 0) {
-                displayText += ` +${bonusCompleted}`;
-            }
-
-            document.getElementById('completed').textContent = displayText;
-            document.getElementById('remaining').textContent = remainingCount;
-            document.getElementById('percentage').textContent = percentage + '%';
-
-            document.querySelector('.progress-bar').style.width = Math.min(percentage, 100) + '%';
-
-            // Update legend items
-            document.querySelectorAll('.pub-item').forEach(item => {
-                const id = parseInt(item.dataset.id);
-                if (completed.includes(id)) {
-                    item.classList.add('completed');
-                } else {
-                    item.classList.remove('completed');
-                }
-            });
-
-            // Update markers
-            pubs.forEach(pub => {
-                if (markers[pub.id]) {
-                    markers[pub.id].setIcon(createIcon(pub));
-                }
-            });
-        }
-
-        // Legend click handlers
-        document.querySelectorAll('.pub-item').forEach(item => {
-            item.addEventListener('click', () => {
-                const id = parseInt(item.dataset.id);
-                togglePub(id);
-            });
-        });
-
-        // Reset button
-        document.getElementById('resetBtn').addEventListener('click', () => {
-            if (confirm('Are you sure you want to reset all progress?')) {
-                completed = [];
-                localStorage.setItem('boelBoelCompleted', JSON.stringify(completed));
-                updateUI();
-            }
-        });
-
-        // Fit map to show all markers
-        const allBounds = L.latLngBounds(pubs.map(p => [p.lat, p.lng]));
-        map.fitBounds(allBounds, { padding: [50, 50] });
-
-        // Add colored area overlays
-        // Red area
-        const redArea = L.rectangle([
-            [51.6878, 5.2990],
-            [51.6905, 5.3020]
-        ], {
-            color: 'none',
-            fillColor: '#E63946',
-            fillOpacity: 0.08,
-            weight: 0
-        }).addTo(map);
-
-        // White area
-        const whiteArea = L.rectangle([
-            [51.6875, 5.3028],
-            [51.6905, 5.3080]
-        ], {
-            color: 'none',
-            fillColor: '#cccccc',
-            fillOpacity: 0.08,
-            weight: 0
-        }).addTo(map);
-
-        // Yellow area
-        const yellowArea = L.rectangle([
-            [51.6860, 5.3045],
-            [51.6890, 5.3085]
-        ], {
-            color: 'none',
-            fillColor: '#F4A460',
-            fillOpacity: 0.08,
-            weight: 0
-        }).addTo(map);
-
-        // Add blue background to surrounding areas
-        const bgLayer = L.rectangle([
-            [51.6820, 5.2950],
-            [51.6920, 5.3120]
-        ], {
-            color: '#3b82f6',
-            fillColor: '#3b82f6',
-            fillOpacity: 0.05,
-            weight: 1,
-            dashArray: '5, 5'
-        }).addTo(map);
-
-
-
-        // Initial UI update
-        updateUI();
-    </script>
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script>
         // Password protection
-        const PASSWORD = 'zootjeongeregeld2026'; // Change this to your desired password
+        const PASSWORD = 'zootjeongeregeld2026';
         
         function checkPassword() {
             const passwordInput = document.getElementById('passwordInput').value;
@@ -1043,9 +457,9 @@
             
             if (passwordInput === PASSWORD) {
                 document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-                // Store session to prevent re-entering password on reload
+                document.getElementById('app').style.display = 'flex';
                 sessionStorage.setItem('boelBoelAuth', 'true');
+                initializeMap();
             } else {
                 errorMessage.style.display = 'block';
                 document.getElementById('passwordInput').value = '';
@@ -1053,20 +467,131 @@
             }
         }
         
-        // Allow Enter key to submit
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if already authenticated in this session
-            if (sessionStorage.getItem('boelBoelAuth') === 'true') {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-            }
+        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') checkPassword();
+        });
+        
+        if (sessionStorage.getItem('boelBoelAuth') === 'true') {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('app').style.display = 'flex';
+            window.addEventListener('load', initializeMap);
+        }
+        
+        // Map initialization
+        let mapInitialized = false;
+        
+        function initializeMap() {
+            if (mapInitialized) return;
+            mapInitialized = true;
             
-            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    checkPassword();
+            const map = L.map('map', { preferCanvas: true }).setView([51.6884, 5.3048], 15);
+            
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap',
+                maxZoom: 19
+            }).addTo(map);
+
+            const pubs = [
+                { id: 1, name: 'Reinders', lat: 51.689658892634846, lng: 5.300710010940677, area: 'red', color: '#E63946', required: true },
+                { id: 2, name: 'Het Veulen', lat: 51.68977209647595, lng: 5.300141446566025, area: 'red', color: '#E63946', required: true },
+                { id: 3, name: 'Bar 35', lat: 51.689901550279856, lng: 5.299624028090119, area: 'red', color: '#E63946', required: true },
+                { id: 4, name: 'Dit', lat: 51.68832490600335, lng: 5.301377522075502, area: 'red', color: '#E63946', required: true },
+                { id: 5, name: 'Jheronimus', lat: 51.68890144131806, lng: 5.303285633408725, area: 'white', color: '#555555', required: true },
+                { id: 6, name: 'Plaats Royaal', lat: 51.688007195275574, lng: 5.303759927835246, area: 'white', color: '#555555', required: true },
+                { id: 7, name: 'Bar Boas', lat: 51.68770346620766, lng: 5.30731419542771, area: 'yellow', color: '#F4A460', required: true },
+                { id: 8, name: 'Bij Dirk', lat: 51.68643255969921, lng: 5.305761098615981, area: 'yellow', color: '#F4A460', required: true },
+                { id: 9, name: 'Eetbar de Stadt', lat: 51.68703937186069, lng: 5.305199444249146, area: 'yellow', color: '#F4A460', required: true },
+                { id: 10, name: 'Pantoffeltje', lat: 51.68761537096449, lng: 5.305789351736798, area: 'yellow', color: '#F4A460', required: true },
+                { id: 11, name: 'Het Hart', lat: 51.68777044650596, lng: 5.307282186244409, area: 'yellow', color: '#F4A460', required: true },
+                { id: 12, name: 'Bonte Pallet', lat: 51.6887586929537, lng: 5.308105723090129, area: 'yellow', color: '#F4A460', required: true },
+                { id: 13, name: 'Baron\'s Lodge', lat: 51.6871376862583, lng: 5.305960825286391, area: 'yellow', color: '#F4A460', required: true },
+                { id: 14, name: 'O\'Mearas Irish Pub', lat: 51.68889799946857, lng: 5.301137668484566, area: 'green', color: '#32CD32', required: false },
+                { id: 15, name: 'Café de Palm', lat: 51.68878809199506, lng: 5.309014070013813, area: 'green', color: '#32CD32', required: false },
+                { id: 16, name: 'De Raadskelder', lat: 51.688507325839424, lng: 5.303281077607486, area: 'green', color: '#32CD32', required: false },
+                { id: 17, name: 'Hello my Friend!', lat: 51.689839348996884, lng: 5.3007707436085205, area: 'green', color: '#32CD32', required: false },
+                { id: 18, name: 'Paternoster', lat: 51.68906730633433, lng: 5.303330878792206, area: 'green', color: '#32CD32', required: false }
+            ];
+
+            let completed = JSON.parse(localStorage.getItem('boelBoelCompleted')) || [];
+            const markers = {};
+
+            function createIcon(pub) {
+                const isCompleted = completed.includes(pub.id);
+                const bgColor = isCompleted ? '#4CAF50' : pub.color;
+                const icon = isCompleted ? '✓' : pub.id;
+                
+                return L.divIcon({
+                    html: `<div style="background-color: ${bgColor}; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 3px solid white; box-shadow: 0 3px 12px rgba(0,0,0,0.3); font-family: 'Fredoka One';">${icon}</div>`,
+                    iconSize: [40, 40],
+                    className: 'leaflet-marker-icon'
+                });
+            }
+
+            pubs.forEach((pub) => {
+                const marker = L.marker([pub.lat, pub.lng], { icon: createIcon(pub) }).addTo(map);
+                markers[pub.id] = marker;
+                
+                const isCompleted = completed.includes(pub.id);
+                marker.bindPopup(`<div><h3 style="color: ${pub.color}; margin-bottom: 8px;">${pub.id}. ${pub.name}</h3><p><strong>Area:</strong> <span style="color: ${pub.color}; font-weight: 600;">${pub.area.toUpperCase()}</span></p><p><strong>Status:</strong> <span style="color: ${isCompleted ? '#4CAF50' : '#F44336'}; font-weight: 600;">${isCompleted ? '✓ Completed' : 'Not visited'}</span></p><div style="margin-top: 10px;"><button onclick="togglePub(${pub.id})" style="width: 100%; padding: 8px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">${isCompleted ? 'Unmark' : 'Mark Complete'}</button></div></div>`);
+            });
+
+            function togglePub(id) {
+                const index = completed.indexOf(id);
+                if (index > -1) {
+                    completed.splice(index, 1);
+                } else {
+                    completed.push(id);
+                }
+                localStorage.setItem('boelBoelCompleted', JSON.stringify(completed));
+                updateUI();
+                
+                const pub = pubs.find(p => p.id === id);
+                markers[id].setIcon(createIcon(pub));
+                setTimeout(() => markers[id].openPopup(), 100);
+            }
+
+            function updateUI() {
+                const requiredPubs = pubs.filter(p => p.required);
+                const requiredCompleted = completed.filter(id => pubs.find(p => p.id === id && p.required)).length;
+                const bonusCompleted = completed.filter(id => pubs.find(p => p.id === id && !p.required)).length;
+                const remainingCount = requiredPubs.length - requiredCompleted;
+                const percentage = Math.round((requiredCompleted / requiredPubs.length) * 100);
+                
+                document.getElementById('completed').textContent = `${requiredCompleted}/${requiredPubs.length}${bonusCompleted > 0 ? ` +${bonusCompleted}` : ''}`;
+                document.getElementById('remaining').textContent = remainingCount;
+                document.getElementById('percentage').textContent = percentage + '%';
+                document.querySelector('.progress-bar').style.width = Math.min(percentage, 100) + '%';
+
+                document.querySelectorAll('.pub-item').forEach(item => {
+                    const id = parseInt(item.dataset.id);
+                    if (completed.includes(id)) {
+                        item.classList.add('completed');
+                    } else {
+                        item.classList.remove('completed');
+                    }
+                });
+            }
+
+            document.querySelectorAll('.pub-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const id = parseInt(item.dataset.id);
+                    togglePub(id);
+                });
+            });
+
+            document.getElementById('resetBtn').addEventListener('click', () => {
+                if (confirm('Reset all progress?')) {
+                    completed = [];
+                    localStorage.setItem('boelBoelCompleted', JSON.stringify(completed));
+                    updateUI();
                 }
             });
-        });
+
+            const allBounds = L.latLngBounds(pubs.map(p => [p.lat, p.lng]));
+            map.fitBounds(allBounds, { padding: [50, 50] });
+            
+            updateUI();
+        }
     </script>
 </body>
 </html>
