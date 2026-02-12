@@ -275,6 +275,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            pointer-events: auto;
+            touch-action: manipulation;
         }
         
         .pub-item:hover {
@@ -352,15 +354,20 @@
                 flex-direction: column;
             }
             .sidebar { 
-                width: 100%; 
-                max-height: 40vh;
-                min-height: 300px;
+                width: 100%;
+                flex: 1;
+                max-height: none;
+                min-height: auto;
             }
             .legend-container {
                 flex: 1;
                 overflow-y: auto;
                 -webkit-overflow-scrolling: touch;
                 padding: 15px;
+            }
+            #map {
+                flex: 0 0 200px;
+                min-height: 200px;
             }
             .header {
                 padding: 15px;
@@ -370,9 +377,6 @@
             }
             .header-subtitle {
                 font-size: 14px;
-            }
-            #map {
-                min-height: 200px;
             }
             .sidebar-header h2 {
                 font-size: 18px;
@@ -384,7 +388,11 @@
         
         @media (max-width: 480px) {
             .sidebar {
-                max-height: 35vh;
+                flex: 1;
+            }
+            #map {
+                flex: 0 0 150px;
+                min-height: 150px;
             }
             .header h1 {
                 font-size: 24px;
@@ -411,7 +419,7 @@
     <!-- Login Screen -->
     <div class="login-container" id="loginScreen">
         <div class="login-box">
-            <h1>🍺 Boel Boel 🍺</h1>
+            <h1>🍺 Boel de boel kroegentocht 🍺</h1>
             <p>Enter the password to access the pub crawl tracker</p>
             <div class="error-message" id="errorMessage">Incorrect password, try again!</div>
             <input type="password" id="passwordInput" placeholder="Enter password" />
@@ -423,7 +431,7 @@
     <div class="container" id="app" style="display: none;">
         <div class="header">
             <div class="header-content">
-                <h1>🍺 De Boel de Boel Tocht 🍺</h1>
+                <h1>🍺 Boel de boel kroegenocht 🍺</h1>
                 <p class="header-subtitle">Den Bosch Pub Crawl Tracker 2026</p>
             </div>
             <div class="progress-bar"></div>
@@ -497,7 +505,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script>
         // Password protection
-        const PASSWORD = 'zootjeongeregeld2026';
+        const PASSWORD = 'zootjeongeregeld202';
         
         function checkPassword() {
             const passwordInput = document.getElementById('passwordInput').value;
