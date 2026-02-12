@@ -206,6 +206,22 @@
             background: white;
         }
         
+        @media (max-width: 768px) {
+            .map-fullscreen {
+                height: 66vh;
+                top: 0;
+            }
+            
+            .map-fullscreen ~ .sidebar {
+                height: 34vh;
+                display: flex !important;
+                position: fixed;
+                bottom: 0;
+                width: 100%;
+                z-index: 9999;
+            }
+        }
+        
         .map-fullscreen .fullscreen-btn::before {
             content: '✕ ';
         }
@@ -460,7 +476,7 @@
     <!-- Login Screen -->
     <div class="login-container" id="loginScreen">
         <div class="login-box">
-            <h1>🍺 Boel de boel tocht 2026 🍺</h1>
+            <h1>🍺 Boel de boel kroegentocht 2026 🍺</h1>
             <p>Enter the password to access the pub crawl tracker</p>
             <div class="error-message" id="errorMessage">Incorrect password, try again!</div>
             <input type="password" id="passwordInput" placeholder="Enter password" />
@@ -472,7 +488,7 @@
     <div class="container" id="app" style="display: none;">
         <div class="header">
             <div class="header-content">
-                <h1>🍺 Boel de boel tocht 2026 🍺</h1>
+                <h1>🍺 Boel de boel kroegocht 2026 🍺</h1>
                 <p class="header-subtitle">Den Bosch Pub Crawl Tracker 2026</p>
             </div>
             <div class="progress-bar"></div>
@@ -600,17 +616,34 @@
             const mapDiv = document.getElementById('map');
             const appDiv = document.getElementById('app');
             const sidebarDiv = document.querySelector('.sidebar');
+            const contentDiv = document.querySelector('.content');
+            const isMobile = window.innerWidth <= 768;
             
             if (mapDiv.classList.contains('map-fullscreen')) {
                 // Exit fullscreen
                 mapDiv.classList.remove('map-fullscreen');
-                sidebarDiv.style.display = 'flex';
-                appDiv.style.overflow = 'hidden';
+                if (isMobile) {
+                    sidebarDiv.style.position = 'relative';
+                    sidebarDiv.style.width = '100%';
+                    sidebarDiv.style.height = 'auto';
+                    sidebarDiv.style.maxHeight = '40vh';
+                    contentDiv.style.flexDirection = 'column';
+                } else {
+                    sidebarDiv.style.display = 'flex';
+                }
             } else {
                 // Enter fullscreen
                 mapDiv.classList.add('map-fullscreen');
-                sidebarDiv.style.display = 'none';
-                appDiv.style.overflow = 'visible';
+                if (isMobile) {
+                    sidebarDiv.style.position = 'fixed';
+                    sidebarDiv.style.width = '100%';
+                    sidebarDiv.style.height = '34vh';
+                    sidebarDiv.style.bottom = '0';
+                    sidebarDiv.style.display = 'flex';
+                    contentDiv.style.flexDirection = 'column';
+                } else {
+                    sidebarDiv.style.display = 'none';
+                }
             }
             
             // Resize map to fit new container
@@ -719,6 +752,11 @@
                 item.addEventListener('click', () => {
                     const id = parseInt(item.dataset.id);
                     togglePub(id);
+                    // Update the marker popup if it exists
+                    if (markers[id]) {
+                        const pub = pubs.find(p => p.id === id);
+                        markers[id].setPopupContent(getPopupContent(pub));
+                    }
                 });
             });
 
