@@ -172,6 +172,8 @@
             background: #e8eef5;
             min-height: 300px;
             position: relative;
+            width: 100%;
+            height: 100%;
         }
         
         .fullscreen-btn {
@@ -200,26 +202,11 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100vw;
+            height: 66vh;
             z-index: 10000;
             background: white;
-        }
-        
-        @media (max-width: 768px) {
-            .map-fullscreen {
-                height: 66vh;
-                top: 0;
-            }
-            
-            .map-fullscreen ~ .sidebar {
-                height: 34vh;
-                display: flex !important;
-                position: fixed;
-                bottom: 0;
-                width: 100%;
-                z-index: 9999;
-            }
+            flex: none;
         }
         
         .map-fullscreen .fullscreen-btn::before {
@@ -470,6 +457,12 @@
             border: none !important;
             box-shadow: none !important;
         }
+        
+        /* Ensure Leaflet container fills the map div */
+        .leaflet-container {
+            width: 100% !important;
+            height: 100% !important;
+        }
     </style>
 </head>
 <body>
@@ -488,7 +481,7 @@
     <div class="container" id="app" style="display: none;">
         <div class="header">
             <div class="header-content">
-                <h1>🍺 Boel de boel kroegocht 2026 🍺</h1>
+                <h1>🍺 Boel de boel kroegentocht 2026 🍺</h1>
                 <p class="header-subtitle">Den Bosch Pub Crawl Tracker 2026</p>
             </div>
             <div class="progress-bar"></div>
@@ -646,11 +639,17 @@
                 }
             }
             
-            // Resize map to fit new container
+            // Resize map to fit new container - multiple triggers for reliability
             if (window.mapInstance) {
                 setTimeout(() => {
-                    window.mapInstance.invalidateSize();
-                }, 100);
+                    window.mapInstance.invalidateSize(true);
+                }, 50);
+                setTimeout(() => {
+                    window.mapInstance.invalidateSize(true);
+                }, 150);
+                setTimeout(() => {
+                    window.mapInstance.invalidateSize(true);
+                }, 300);
             }
         }
         
