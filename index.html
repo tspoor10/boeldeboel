@@ -196,17 +196,27 @@
             transform: scale(1.1);
         }
         
-        .map-fullscreen {
+        .fullscreen-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 10000;
+            width: 100vw;
+            height: 100vh;
+            z-index: 10001;
+            display: none;
             background: white;
         }
         
-        .map-fullscreen .fullscreen-btn::before {
+        .fullscreen-overlay.active {
+            display: block;
+        }
+        
+        .fullscreen-overlay #mapFullscreen {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .fullscreen-overlay .fullscreen-btn::before {
             content: '✕ ';
         }
         
@@ -478,6 +488,14 @@
             <div class="progress-bar"></div>
         </div>
         
+        <!-- Fullscreen overlay -->
+        <div class="fullscreen-overlay" id="fullscreenOverlay">
+            <div style="position: relative; flex: 1; width: 100%; display: flex;">
+                <div id="mapFullscreen" style="flex: 1; background: #e8eef5;"></div>
+                <button class="fullscreen-btn" onclick="toggleMapFullscreen()"></button>
+            </div>
+        </div>
+        
         <div class="content">
             <div id="map">
                 <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleMapFullscreen()"></button>
@@ -597,29 +615,34 @@
         }
         
         function toggleMapFullscreen() {
+            const overlay = document.getElementById('fullscreenOverlay');
             const mapDiv = document.getElementById('map');
-            const container = document.querySelector('.container');
-            const header = document.querySelector('.header');
+            const mapFullscreen = document.getElementById('mapFullscreen');
             const sidebar = document.querySelector('.sidebar');
+            const header = document.querySelector('.header');
             
-            if (mapDiv.classList.contains('map-fullscreen')) {
+            if (overlay.classList.contains('active')) {
                 // Exit fullscreen
-                mapDiv.classList.remove('map-fullscreen');
+                overlay.classList.remove('active');
                 header.style.display = 'flex';
                 sidebar.style.display = 'flex';
-                container.style.overflow = 'hidden';
+                document.body.style.overflow = 'hidden';
+                mapDiv.style.display = 'flex';
             } else {
                 // Enter fullscreen
-                mapDiv.classList.add('map-fullscreen');
+                overlay.classList.add('active');
                 header.style.display = 'none';
                 sidebar.style.display = 'none';
-                container.style.overflow = 'visible';
+                document.body.style.overflow = 'hidden';
+                mapDiv.style.display = 'none';
             }
             
             // Trigger map resize
-            if (window.mapInstance) {
-                window.mapInstance.invalidateSize(true);
-            }
+            setTimeout(() => {
+                if (window.mapInstance) {
+                    window.mapInstance.invalidateSize(true);
+                }
+            }, 100);
         }
         
         function togglePub(id) {
