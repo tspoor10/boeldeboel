@@ -170,10 +170,8 @@
         #map {
             flex: 1;
             background: #e8eef5;
-            min-height: 300px;
             position: relative;
-            width: 100%;
-            height: 100%;
+            overflow: hidden;
         }
         
         .fullscreen-btn {
@@ -202,11 +200,10 @@
             position: fixed;
             top: 0;
             left: 0;
-            width: 100vw;
-            height: 66vh;
+            width: 100%;
+            height: 100%;
             z-index: 10000;
             background: white;
-            flex: none;
         }
         
         .map-fullscreen .fullscreen-btn::before {
@@ -457,12 +454,6 @@
             border: none !important;
             box-shadow: none !important;
         }
-        
-        /* Ensure Leaflet container fills the map div */
-        .leaflet-container {
-            width: 100% !important;
-            height: 100% !important;
-        }
     </style>
 </head>
 <body>
@@ -607,49 +598,27 @@
         
         function toggleMapFullscreen() {
             const mapDiv = document.getElementById('map');
-            const appDiv = document.getElementById('app');
-            const sidebarDiv = document.querySelector('.sidebar');
-            const contentDiv = document.querySelector('.content');
-            const isMobile = window.innerWidth <= 768;
+            const container = document.querySelector('.container');
+            const header = document.querySelector('.header');
+            const sidebar = document.querySelector('.sidebar');
             
             if (mapDiv.classList.contains('map-fullscreen')) {
                 // Exit fullscreen
                 mapDiv.classList.remove('map-fullscreen');
-                if (isMobile) {
-                    sidebarDiv.style.position = 'relative';
-                    sidebarDiv.style.width = '100%';
-                    sidebarDiv.style.height = 'auto';
-                    sidebarDiv.style.maxHeight = '40vh';
-                    contentDiv.style.flexDirection = 'column';
-                } else {
-                    sidebarDiv.style.display = 'flex';
-                }
+                header.style.display = 'flex';
+                sidebar.style.display = 'flex';
+                container.style.overflow = 'hidden';
             } else {
                 // Enter fullscreen
                 mapDiv.classList.add('map-fullscreen');
-                if (isMobile) {
-                    sidebarDiv.style.position = 'fixed';
-                    sidebarDiv.style.width = '100%';
-                    sidebarDiv.style.height = '34vh';
-                    sidebarDiv.style.bottom = '0';
-                    sidebarDiv.style.display = 'flex';
-                    contentDiv.style.flexDirection = 'column';
-                } else {
-                    sidebarDiv.style.display = 'none';
-                }
+                header.style.display = 'none';
+                sidebar.style.display = 'none';
+                container.style.overflow = 'visible';
             }
             
-            // Resize map to fit new container - multiple triggers for reliability
+            // Trigger map resize
             if (window.mapInstance) {
-                setTimeout(() => {
-                    window.mapInstance.invalidateSize(true);
-                }, 50);
-                setTimeout(() => {
-                    window.mapInstance.invalidateSize(true);
-                }, 150);
-                setTimeout(() => {
-                    window.mapInstance.invalidateSize(true);
-                }, 300);
+                window.mapInstance.invalidateSize(true);
             }
         }
         
