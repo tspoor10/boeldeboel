@@ -224,6 +224,7 @@
         .legend-container {
             flex: 1;
             overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             padding: 20px;
             min-height: 0;
         }
@@ -347,8 +348,55 @@
         }
 
         @media (max-width: 768px) {
-            .content { flex-direction: column; }
-            .sidebar { width: 100%; max-height: 35%; }
+            .content { 
+                flex-direction: column;
+            }
+            .sidebar { 
+                width: 100%; 
+                max-height: 40vh;
+                min-height: 300px;
+            }
+            .legend-container {
+                flex: 1;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 15px;
+            }
+            .header {
+                padding: 15px;
+            }
+            .header h1 {
+                font-size: 28px;
+            }
+            .header-subtitle {
+                font-size: 14px;
+            }
+            #map {
+                min-height: 200px;
+            }
+            .sidebar-header h2 {
+                font-size: 18px;
+            }
+            .stat-number {
+                font-size: 16px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .sidebar {
+                max-height: 35vh;
+            }
+            .header h1 {
+                font-size: 24px;
+            }
+            .pub-item {
+                padding: 10px 12px;
+                font-size: 12px;
+            }
+            .area-name {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
         }
         
         /* Hide default Leaflet marker styling */
@@ -479,6 +527,74 @@
         
         // Map initialization
         let mapInitialized = false;
+        let pubs = [];
+        let markers = {};
+        let completed = [];
+        
+        function getPopupContent(pub) {
+            const isCompleted = completed.includes(pub.id);
+            return `<div><h3 style="color: ${pub.color}; margin-bottom: 8px;">${pub.id}. ${pub.name}</h3><p><strong>Area:</strong> <span style="color: ${pub.color}; font-weight: 600;">${pub.area.toUpperCase()}</span></p><p><strong>Status:</strong> <span style="color: ${isCompleted ? '#4CAF50' : '#F44336'}; font-weight: 600;">${isCompleted ? '✓ Completed' : 'Not visited'}</span></p><div style="margin-top: 10px;"><button onclick="togglePubAndUpdate(${pub.id})" style="width: 100%; padding: 8px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">${isCompleted ? 'Unmark' : 'Mark Complete'}</button></div></div>`;
+        }
+        
+        function togglePubAndUpdate(id) {
+            togglePub(id);
+            // Update the popup with new content
+            const pub = pubs.find(p => p.id === id);
+            if (markers[id]) {
+                markers[id].setPopupContent(getPopupContent(pub));
+            }
+        }
+        
+        function togglePub(id) {
+            const index = completed.indexOf(id);
+            if (index > -1) {
+                completed.splice(index, 1);
+            } else {
+                completed.push(id);
+            }
+            localStorage.setItem('boelBoelCompleted', JSON.stringify(completed));
+            updateUI();
+            
+            const pub = pubs.find(p => p.id === id);
+            if (markers[id]) {
+                markers[id].setIcon(createIcon(pub));
+                setTimeout(() => markers[id].openPopup(), 100);
+            }
+        }
+        
+        function createIcon(pub) {
+            const isCompleted = completed.includes(pub.id);
+            const bgColor = isCompleted ? '#4CAF50' : pub.color;
+            const icon = isCompleted ? '✓' : pub.id;
+            
+            return L.divIcon({
+                html: `<div style="background-color: ${bgColor}; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 3px solid white; box-shadow: 0 3px 12px rgba(0,0,0,0.3); font-family: 'Fredoka One';">${icon}</div>`,
+                iconSize: [40, 40],
+                className: 'leaflet-marker-icon'
+            });
+        }
+        
+        function updateUI() {
+            const requiredPubs = pubs.filter(p => p.required);
+            const requiredCompleted = completed.filter(id => pubs.find(p => p.id === id && p.required)).length;
+            const bonusCompleted = completed.filter(id => pubs.find(p => p.id === id && !p.required)).length;
+            const remainingCount = requiredPubs.length - requiredCompleted;
+            const percentage = Math.round((requiredCompleted / requiredPubs.length) * 100);
+            
+            document.getElementById('completed').textContent = `${requiredCompleted}/${requiredPubs.length}${bonusCompleted > 0 ? ` +${bonusCompleted}` : ''}`;
+            document.getElementById('remaining').textContent = remainingCount;
+            document.getElementById('percentage').textContent = percentage + '%';
+            document.querySelector('.progress-bar').style.width = Math.min(percentage, 100) + '%';
+
+            document.querySelectorAll('.pub-item').forEach(item => {
+                const id = parseInt(item.dataset.id);
+                if (completed.includes(id)) {
+                    item.classList.add('completed');
+                } else {
+                    item.classList.remove('completed');
+                }
+            });
+        }
         
         function initializeMap() {
             if (mapInitialized) return;
@@ -491,7 +607,7 @@
                 maxZoom: 19
             }).addTo(map);
 
-            const pubs = [
+            pubs = [
                 { id: 1, name: 'Reinders', lat: 51.689658892634846, lng: 5.300710010940677, area: 'red', color: '#E63946', required: true },
                 { id: 2, name: 'Het Veulen', lat: 51.68977209647595, lng: 5.300141446566025, area: 'red', color: '#E63946', required: true },
                 { id: 3, name: 'Bar 35', lat: 51.689901550279856, lng: 5.299624028090119, area: 'red', color: '#E63946', required: true },
@@ -512,65 +628,15 @@
                 { id: 18, name: 'Paternoster', lat: 51.68906730633433, lng: 5.303330878792206, area: 'green', color: '#32CD32', required: false }
             ];
 
-            let completed = JSON.parse(localStorage.getItem('boelBoelCompleted')) || [];
-            const markers = {};
-
-            function createIcon(pub) {
-                const isCompleted = completed.includes(pub.id);
-                const bgColor = isCompleted ? '#4CAF50' : pub.color;
-                const icon = isCompleted ? '✓' : pub.id;
-                
-                return L.divIcon({
-                    html: `<div style="background-color: ${bgColor}; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 3px solid white; box-shadow: 0 3px 12px rgba(0,0,0,0.3); font-family: 'Fredoka One';">${icon}</div>`,
-                    iconSize: [40, 40],
-                    className: 'leaflet-marker-icon'
-                });
-            }
+            completed = JSON.parse(localStorage.getItem('boelBoelCompleted')) || [];
 
             pubs.forEach((pub) => {
                 const marker = L.marker([pub.lat, pub.lng], { icon: createIcon(pub) }).addTo(map);
                 markers[pub.id] = marker;
                 
                 const isCompleted = completed.includes(pub.id);
-                marker.bindPopup(`<div><h3 style="color: ${pub.color}; margin-bottom: 8px;">${pub.id}. ${pub.name}</h3><p><strong>Area:</strong> <span style="color: ${pub.color}; font-weight: 600;">${pub.area.toUpperCase()}</span></p><p><strong>Status:</strong> <span style="color: ${isCompleted ? '#4CAF50' : '#F44336'}; font-weight: 600;">${isCompleted ? '✓ Completed' : 'Not visited'}</span></p><div style="margin-top: 10px;"><button onclick="togglePub(${pub.id})" style="width: 100%; padding: 8px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">${isCompleted ? 'Unmark' : 'Mark Complete'}</button></div></div>`);
+                marker.bindPopup(getPopupContent(pub));
             });
-
-            function togglePub(id) {
-                const index = completed.indexOf(id);
-                if (index > -1) {
-                    completed.splice(index, 1);
-                } else {
-                    completed.push(id);
-                }
-                localStorage.setItem('boelBoelCompleted', JSON.stringify(completed));
-                updateUI();
-                
-                const pub = pubs.find(p => p.id === id);
-                markers[id].setIcon(createIcon(pub));
-                setTimeout(() => markers[id].openPopup(), 100);
-            }
-
-            function updateUI() {
-                const requiredPubs = pubs.filter(p => p.required);
-                const requiredCompleted = completed.filter(id => pubs.find(p => p.id === id && p.required)).length;
-                const bonusCompleted = completed.filter(id => pubs.find(p => p.id === id && !p.required)).length;
-                const remainingCount = requiredPubs.length - requiredCompleted;
-                const percentage = Math.round((requiredCompleted / requiredPubs.length) * 100);
-                
-                document.getElementById('completed').textContent = `${requiredCompleted}/${requiredPubs.length}${bonusCompleted > 0 ? ` +${bonusCompleted}` : ''}`;
-                document.getElementById('remaining').textContent = remainingCount;
-                document.getElementById('percentage').textContent = percentage + '%';
-                document.querySelector('.progress-bar').style.width = Math.min(percentage, 100) + '%';
-
-                document.querySelectorAll('.pub-item').forEach(item => {
-                    const id = parseInt(item.dataset.id);
-                    if (completed.includes(id)) {
-                        item.classList.add('completed');
-                    } else {
-                        item.classList.remove('completed');
-                    }
-                });
-            }
 
             document.querySelectorAll('.pub-item').forEach(item => {
                 item.addEventListener('click', () => {
