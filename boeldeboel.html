@@ -171,6 +171,47 @@
             flex: 1;
             background: #e8eef5;
             min-height: 300px;
+            position: relative;
+        }
+        
+        .fullscreen-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            border: 2px solid #C41E3A;
+            border-radius: 6px;
+            padding: 10px 15px;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 999;
+            transition: all 0.3s;
+            font-weight: bold;
+            color: #C41E3A;
+        }
+        
+        .fullscreen-btn:hover {
+            background: #C41E3A;
+            color: white;
+            transform: scale(1.1);
+        }
+        
+        .map-fullscreen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            background: white;
+        }
+        
+        .map-fullscreen .fullscreen-btn::before {
+            content: '✕ ';
+        }
+        
+        .fullscreen-btn::before {
+            content: '⛶ ';
         }
         
         .sidebar {
@@ -419,7 +460,7 @@
     <!-- Login Screen -->
     <div class="login-container" id="loginScreen">
         <div class="login-box">
-            <h1>🍺 Boel de boel kroegentocht 🍺</h1>
+            <h1>🍺 Boel de boel tocht 2026 🍺</h1>
             <p>Enter the password to access the pub crawl tracker</p>
             <div class="error-message" id="errorMessage">Incorrect password, try again!</div>
             <input type="password" id="passwordInput" placeholder="Enter password" />
@@ -431,14 +472,16 @@
     <div class="container" id="app" style="display: none;">
         <div class="header">
             <div class="header-content">
-                <h1>🍺 Boel de boel kroegenocht 🍺</h1>
+                <h1>🍺 Boel de boel tocht 2026 🍺</h1>
                 <p class="header-subtitle">Den Bosch Pub Crawl Tracker 2026</p>
             </div>
             <div class="progress-bar"></div>
         </div>
         
         <div class="content">
-            <div id="map"></div>
+            <div id="map">
+                <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleMapFullscreen()"></button>
+            </div>
             
             <div class="sidebar">
                 <div class="sidebar-header">
@@ -505,7 +548,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <script>
         // Password protection
-        const PASSWORD = 'zootjeongeregeld202';
+        const PASSWORD = 'zootjeongeregeld2026';
         
         function checkPassword() {
             const passwordInput = document.getElementById('passwordInput').value;
@@ -550,6 +593,31 @@
             const pub = pubs.find(p => p.id === id);
             if (markers[id]) {
                 markers[id].setPopupContent(getPopupContent(pub));
+            }
+        }
+        
+        function toggleMapFullscreen() {
+            const mapDiv = document.getElementById('map');
+            const appDiv = document.getElementById('app');
+            const sidebarDiv = document.querySelector('.sidebar');
+            
+            if (mapDiv.classList.contains('map-fullscreen')) {
+                // Exit fullscreen
+                mapDiv.classList.remove('map-fullscreen');
+                sidebarDiv.style.display = 'flex';
+                appDiv.style.overflow = 'hidden';
+            } else {
+                // Enter fullscreen
+                mapDiv.classList.add('map-fullscreen');
+                sidebarDiv.style.display = 'none';
+                appDiv.style.overflow = 'visible';
+            }
+            
+            // Resize map to fit new container
+            if (window.mapInstance) {
+                setTimeout(() => {
+                    window.mapInstance.invalidateSize();
+                }, 100);
             }
         }
         
@@ -609,6 +677,7 @@
             mapInitialized = true;
             
             const map = L.map('map', { preferCanvas: true }).setView([51.6884, 5.3048], 15);
+            window.mapInstance = map;
             
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 attribution: '© OpenStreetMap',
