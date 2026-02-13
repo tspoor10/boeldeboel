@@ -5,518 +5,112 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>De Boel de Boel Tocht - Den Bosch Pub Crawl</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Fredoka:wght@400;600;700&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Fredoka', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            height: 100vh;
-            overflow: hidden;
-        }
-        
-        .login-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            z-index: 1000;
-        }
-        
-        .login-box {
-            background: linear-gradient(135deg, #C41E3A 0%, #FF6B6B 50%, #FFA500 100%);
-            padding: 50px;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
-            text-align: center;
-            max-width: 400px;
-            animation: slideIn 0.5s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .login-box h1 {
-            font-family: 'Fredoka One', cursive;
-            font-size: 42px;
-            color: white;
-            margin-bottom: 20px;
-            text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
-        }
-        
-        .login-box p {
-            color: white;
-            margin-bottom: 30px;
-            font-size: 16px;
-            opacity: 0.95;
-        }
-        
-        .login-box input {
-            width: 100%;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 2px solid white;
-            border-radius: 8px;
-            font-size: 16px;
-            font-family: 'Fredoka', sans-serif;
-            background: rgba(255,255,255,0.9);
-        }
-        
-        .login-box input:focus {
-            outline: none;
-            background: white;
-            box-shadow: 0 0 10px rgba(255,255,255,0.5);
-        }
-        
-        .login-box button {
-            width: 100%;
-            padding: 15px;
-            background: white;
-            color: #C41E3A;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-family: 'Fredoka', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .login-box button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-        }
-        
-        .error-message {
-            color: #fff;
-            background: rgba(0,0,0,0.3);
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            display: none;
-            font-size: 14px;
-        }
-        
-        .login-container.hidden {
-            display: none;
-        }
-        
-        .container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #C41E3A 0%, #FF6B6B 50%, #FFA500 100%);
-            color: white;
-            padding: 25px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(196, 30, 58, 0.4);
-            z-index: 100;
-            border-bottom: 4px solid #FFD700;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .header-content {
-            position: relative;
-            z-index: 1;
-        }
-        
-        .header h1 {
-            font-family: 'Fredoka One', cursive;
-            font-size: 42px;
-            margin-bottom: 8px;
-            text-shadow: 3px 3px 0 rgba(0,0,0,0.3);
-            letter-spacing: 1px;
-        }
-        
-        .header-subtitle {
-            font-size: 16px;
-            opacity: 0.95;
-            letter-spacing: 0.5px;
-        }
-        
-        .progress-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 4px;
-            background: #FFD700;
-            transition: width 0.5s ease;
-            width: 0%;
-        }
-        
-        .content {
-            display: flex;
-            flex: 1;
-            gap: 0;
-            overflow: hidden;
-        }
-        
-        #map {
-            flex: 1;
-            background: #e8eef5;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .fullscreen-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: white;
-            border: 2px solid #C41E3A;
-            border-radius: 6px;
-            padding: 10px 15px;
-            font-size: 18px;
-            cursor: pointer;
-            z-index: 999;
-            transition: all 0.3s;
-            font-weight: bold;
-            color: #C41E3A;
-        }
-        
-        .fullscreen-btn:hover {
-            background: #C41E3A;
-            color: white;
-            transform: scale(1.1);
-        }
-        
-        .fullscreen-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 10001;
-            display: none;
-            background: white;
-        }
-        
-        .fullscreen-overlay.active {
-            display: block;
-        }
-        
-        .fullscreen-overlay #mapFullscreen {
-            width: 100%;
-            height: 100%;
-        }
-        
-        .fullscreen-overlay .fullscreen-btn::before {
-            content: '✕ ';
-        }
-        
-        .fullscreen-btn::before {
-            content: '⛶ ';
-        }
-        
-        .sidebar {
-            width: 320px;
-            background: white;
-            display: flex;
-            flex-direction: column;
-            box-shadow: -4px 0 16px rgba(0,0,0,0.2);
-            overflow: hidden;
-        }
-        
-        .sidebar-header {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            color: white;
-            padding: 20px;
-            border-bottom: 3px solid #C41E3A;
-        }
-        
-        .sidebar-header h2 {
-            font-family: 'Fredoka One', cursive;
-            font-size: 20px;
-            margin-bottom: 10px;
-        }
-        
-        .stats {
-            display: flex;
-            gap: 15px;
-            font-size: 13px;
-        }
-        
-        .stat {
-            flex: 1;
-            text-align: center;
-            padding: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 6px;
-        }
-        
-        .stat-number {
-            font-weight: 700;
-            font-size: 18px;
-            color: #FFD700;
-            display: block;
-        }
-        
-        .stat-label {
-            font-size: 11px;
-            opacity: 0.8;
-        }
-        
-        .legend-container {
-            flex: 1;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 20px;
-            min-height: 0;
-        }
-        
-        .area-group {
-            margin-bottom: 25px;
-        }
-        
-        .area-name {
-            font-family: 'Fredoka One', cursive;
-            font-weight: 700;
-            padding: 10px 14px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            color: white;
-            font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .area-name::before {
-            content: '';
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: white;
-            flex-shrink: 0;
-        }
-        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Fredoka', sans-serif; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); height: 100vh; overflow: hidden; }
+        .login-container { display: flex; align-items: center; justify-content: center; height: 100vh; background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); }
+        .login-box { background: linear-gradient(135deg, #C41E3A 0%, #FF6B6B 50%, #FFA500 100%); padding: 50px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); text-align: center; max-width: 400px; }
+        .login-box h1 { font-family: 'Fredoka One', cursive; font-size: 42px; color: white; margin-bottom: 20px; text-shadow: 3px 3px 0 rgba(0,0,0,0.3); }
+        .login-box p { color: white; margin-bottom: 30px; font-size: 16px; }
+        .login-box input { width: 100%; padding: 15px; margin-bottom: 15px; border: 2px solid white; border-radius: 8px; font-size: 16px; font-family: 'Fredoka', sans-serif; background: rgba(255,255,255,0.9); }
+        .login-box button { width: 100%; padding: 15px; background: white; color: #C41E3A; border: none; border-radius: 8px; font-size: 16px; font-weight: 700; cursor: pointer; font-family: 'Fredoka', sans-serif; text-transform: uppercase; }
+        .error-message { color: #fff; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 5px; margin-bottom: 15px; display: none; font-size: 14px; }
+        .container { width: 100%; height: 100%; display: flex; flex-direction: column; }
+        .header { background: linear-gradient(135deg, #C41E3A 0%, #FF6B6B 50%, #FFA500 100%); color: white; padding: 25px; text-align: center; box-shadow: 0 8px 32px rgba(196, 30, 58, 0.4); border-bottom: 4px solid #FFD700; position: relative; z-index: 100; }
+        .header h1 { font-family: 'Fredoka One', cursive; font-size: 42px; margin-bottom: 8px; text-shadow: 3px 3px 0 rgba(0,0,0,0.3); }
+        .header-subtitle { font-size: 16px; opacity: 0.95; }
+        .progress-bar { position: absolute; bottom: 0; left: 0; height: 4px; background: #FFD700; transition: width 0.5s ease; width: 0%; }
+        .content { display: flex; flex: 1; gap: 0; overflow: hidden; }
+        #map { flex: 1; background: #e8eef5; position: relative; overflow: hidden; }
+        .fullscreen-btn { position: absolute; top: 10px; right: 10px; background: white; border: 2px solid #C41E3A; border-radius: 6px; padding: 10px 15px; font-size: 18px; cursor: pointer; z-index: 999; transition: all 0.3s; font-weight: bold; color: #C41E3A; }
+        .fullscreen-btn:hover { background: #C41E3A; color: white; transform: scale(1.1); }
+        #map.fullscreen { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10000; flex: none; }
+        .container.fullscreen-mode .header { display: none; }
+        .container.fullscreen-mode .sidebar { display: none; }
+        .container.fullscreen-mode .content { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; }
+        .fullscreen-btn::before { content: '⛶ '; }
+        .fullscreen-btn.exit::before { content: '✕ '; }
+        .sidebar { width: 320px; background: white; display: flex; flex-direction: column; box-shadow: -4px 0 16px rgba(0,0,0,0.2); overflow: hidden; }
+        .sidebar-header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: white; padding: 20px; border-bottom: 3px solid #C41E3A; }
+        .sidebar-header h2 { font-family: 'Fredoka One', cursive; font-size: 20px; margin-bottom: 10px; }
+        .stats { display: flex; gap: 15px; font-size: 13px; }
+        .stat { flex: 1; text-align: center; padding: 8px; background: rgba(255,255,255,0.1); border-radius: 6px; }
+        .stat-number { font-weight: 700; font-size: 18px; color: #FFD700; display: block; }
+        .stat-label { font-size: 11px; opacity: 0.8; }
+        .legend-container { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px; min-height: 0; background: white; }
+        .area-group { margin-bottom: 25px; }
+        .area-name { font-family: 'Fredoka One', cursive; font-weight: 700; padding: 10px 14px; border-radius: 8px; margin-bottom: 12px; color: white; font-size: 13px; text-transform: uppercase; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 10px; }
+        .area-name::before { content: ''; width: 12px; height: 12px; border-radius: 50%; background: white; flex-shrink: 0; }
         .area-name.red { background: linear-gradient(135deg, #E63946 0%, #C41E3A 100%); }
         .area-name.white { background: linear-gradient(135deg, #555555 0%, #333333 100%); }
         .area-name.yellow { background: linear-gradient(135deg, #F4A460 0%, #FF8C42 100%); }
         .area-name.green { background: linear-gradient(135deg, #32CD32 0%, #228B22 100%); }
-        
-        .pub-item {
-            padding: 12px 14px;
-            margin-bottom: 8px;
-            border-left: 4px solid;
-            border-radius: 6px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: rgba(0,0,0,0.03);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            pointer-events: auto;
-            touch-action: manipulation;
-        }
-        
-        .pub-item:hover {
-            transform: translateX(6px);
-            background: rgba(0,0,0,0.06);
-        }
-        
+        .pub-item { padding: 12px 14px; margin-bottom: 8px; border-left: 4px solid; border-radius: 6px; font-size: 13px; cursor: pointer; transition: all 0.3s; background: rgba(0,0,0,0.03); display: flex; align-items: center; gap: 10px; }
+        .pub-item:hover { transform: translateX(6px); background: rgba(0,0,0,0.06); }
         .pub-item.red { border-left-color: #E63946; }
         .pub-item.white { border-left-color: #333; }
         .pub-item.yellow { border-left-color: #F4A460; }
         .pub-item.green { border-left-color: #32CD32; }
-        
-        .pub-item.completed {
-            background: rgba(76, 175, 80, 0.1);
-            border-left-color: #4CAF50;
-            opacity: 0.7;
-        }
-        
-        .pub-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 24px;
-            height: 24px;
-            background: rgba(0,0,0,0.08);
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-        
+        .pub-item.completed { background: rgba(76, 175, 80, 0.1); border-left-color: #4CAF50; opacity: 0.7; }
+        .pub-number { display: inline-flex; align-items: center; justify-content: center; min-width: 24px; height: 24px; background: rgba(0,0,0,0.08); border-radius: 4px; font-size: 12px; font-weight: 700; flex-shrink: 0; }
         .pub-item.red .pub-number { color: #E63946; }
         .pub-item.white .pub-number { color: #333; }
         .pub-item.yellow .pub-number { color: #F4A460; }
         .pub-item.green .pub-number { color: #32CD32; }
         .pub-item.completed .pub-number { background: #4CAF50; color: white; }
-        
         .pub-name { flex: 1; }
-        
-        .checkbox {
-            width: 20px;
-            height: 20px;
-            border: 2px solid currentColor;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
-            color: #999;
-            flex-shrink: 0;
-        }
-        
-        .pub-item.completed .checkbox {
-            background: #4CAF50;
-            color: white;
-            border-color: #4CAF50;
-        }
-        
-        .reset-button {
-            padding: 10px 14px;
-            margin: 15px 20px;
-            background: #f44336;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: 600;
-            font-size: 12px;
-            text-transform: uppercase;
-        }
-
+        .checkbox { width: 20px; height: 20px; border: 2px solid currentColor; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: #999; flex-shrink: 0; }
+        .pub-item.completed .checkbox { background: #4CAF50; color: white; border-color: #4CAF50; }
+        .reset-button { padding: 10px 14px; margin: 15px 20px; background: #f44336; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 12px; text-transform: uppercase; }
+        .leaflet-marker-icon { background: transparent !important; border: none !important; box-shadow: none !important; }
+        #returningClientInfo { margin-bottom: 15px; }
         @media (max-width: 768px) {
-            .content { 
-                flex-direction: column;
-            }
-            .sidebar { 
-                width: 100%;
-                flex: 1;
-                max-height: none;
-                min-height: auto;
-            }
-            .legend-container {
-                flex: 1;
-                overflow-y: auto;
-                -webkit-overflow-scrolling: touch;
-                padding: 15px;
-            }
-            #map {
-                flex: 0 0 200px;
-                min-height: 200px;
-            }
-            .header {
-                padding: 15px;
-            }
-            .header h1 {
-                font-size: 28px;
-            }
-            .header-subtitle {
-                font-size: 14px;
-            }
-            .sidebar-header h2 {
-                font-size: 18px;
-            }
-            .stat-number {
-                font-size: 16px;
-            }
+            body { height: auto; overflow: auto; }
+            .container { height: auto; overflow: auto; }
+            .content { flex-direction: column; height: auto; overflow: auto; }
+            .sidebar { width: 100%; flex: none; height: auto; overflow: visible; }
+            #map { flex: none; width: 100%; height: 250px; }
+            .legend-container { height: auto; overflow: visible; }
         }
-        
         @media (max-width: 480px) {
-            .sidebar {
-                flex: 1;
-            }
-            #map {
-                flex: 0 0 150px;
-                min-height: 150px;
-            }
-            .header h1 {
-                font-size: 24px;
-            }
-            .pub-item {
-                padding: 10px 12px;
-                font-size: 12px;
-            }
-            .area-name {
-                padding: 8px 12px;
-                font-size: 12px;
-            }
-        }
-        
-        /* Hide default Leaflet marker styling */
-        .leaflet-marker-icon {
-            background: transparent !important;
-            border: none !important;
-            box-shadow: none !important;
+            #map { height: 200px; }
         }
     </style>
 </head>
 <body>
-    <!-- Login Screen -->
     <div class="login-container" id="loginScreen">
         <div class="login-box">
             <h1>🍺 Boel de boel kroegentocht 2026 🍺</h1>
             <p>Enter the password to access the pub crawl tracker</p>
             <div class="error-message" id="errorMessage">Incorrect password, try again!</div>
             <input type="password" id="passwordInput" placeholder="Enter password" />
-            <button onclick="checkPassword()">Access Tracker</button>
+            <button onclick="window.checkPassword()">Access Tracker</button>
         </div>
     </div>
 
-    <!-- Main App -->
     <div class="container" id="app" style="display: none;">
         <div class="header">
             <div class="header-content">
                 <h1>🍺 Boel de boel kroegentocht 2026 🍺</h1>
-                <p class="header-subtitle">Den Bosch Pub Crawl Tracker 2026</p>
+                <p class="header-subtitle">De enige échte kroegentocht van Oeteldonk</p>
             </div>
             <div class="progress-bar"></div>
         </div>
         
-        <!-- Fullscreen overlay -->
-        <div class="fullscreen-overlay" id="fullscreenOverlay">
-            <div style="position: relative; flex: 1; width: 100%; display: flex;">
-                <div id="mapFullscreen" style="flex: 1; background: #e8eef5;"></div>
-                <button class="fullscreen-btn" onclick="toggleMapFullscreen()"></button>
-            </div>
-        </div>
-        
-        <div class="content">
+        <div class="content" id="content">
             <div id="map">
-                <button class="fullscreen-btn" id="fullscreenBtn" onclick="toggleMapFullscreen()"></button>
+                <button class="fullscreen-btn" id="fullscreenBtn" onclick="window.toggleMapFullscreen()"></button>
             </div>
             
             <div class="sidebar">
                 <div class="sidebar-header">
                     <h2>Your Progress</h2>
                     <div class="stats">
-                        <div class="stat">
-                            <span class="stat-number" id="completed">0</span>
-                            <span class="stat-label">Completed</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-number" id="remaining">13</span>
-                            <span class="stat-label">Remaining</span>
-                        </div>
-                        <div class="stat">
-                            <span class="stat-number" id="percentage">0%</span>
-                            <span class="stat-label">Progress</span>
-                        </div>
+                        <div class="stat"><span class="stat-number" id="completed">0</span><span class="stat-label">Completed</span></div>
+                        <div class="stat"><span class="stat-number" id="remaining">13</span><span class="stat-label">Remaining</span></div>
+                        <div class="stat"><span class="stat-number" id="percentage">0%</span><span class="stat-label">Progress</span></div>
                     </div>
                 </div>
                 
@@ -528,13 +122,11 @@
                         <div class="pub-item red" data-id="3"><div class="pub-number">3</div><div class="pub-name">Bar 35</div><div class="checkbox">✓</div></div>
                         <div class="pub-item red" data-id="4"><div class="pub-number">4</div><div class="pub-name">Dit</div><div class="checkbox">✓</div></div>
                     </div>
-                    
                     <div class="area-group">
                         <div class="area-name white">⚪ White Area</div>
                         <div class="pub-item white" data-id="5"><div class="pub-number">5</div><div class="pub-name">Jheronimus</div><div class="checkbox">✓</div></div>
                         <div class="pub-item white" data-id="6"><div class="pub-number">6</div><div class="pub-name">Plaats Royaal</div><div class="checkbox">✓</div></div>
                     </div>
-                    
                     <div class="area-group">
                         <div class="area-name yellow">🟡 Yellow Area</div>
                         <div class="pub-item yellow" data-id="7"><div class="pub-number">7</div><div class="pub-name">Bar Boas</div><div class="checkbox">✓</div></div>
@@ -545,9 +137,7 @@
                         <div class="pub-item yellow" data-id="12"><div class="pub-number">12</div><div class="pub-name">Bonte Pallet</div><div class="checkbox">✓</div></div>
                         <div class="pub-item yellow" data-id="13"><div class="pub-number">13</div><div class="pub-name">Baron's Lodge</div><div class="checkbox">✓</div></div>
                     </div>
-                    
-                    <div style="font-family: 'Fredoka One'; font-size: 11px; color: #999; margin-top: 15px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 700;">🌟 Bonus Pubs (Optional)</div>
-                    
+                    <div style="font-family: 'Fredoka One'; font-size: 11px; color: #999; margin-top: 15px; text-transform: uppercase; font-weight: 700;">🌟 Bonus Pubs (Optional)</div>
                     <div class="area-group">
                         <div class="area-name green">💚 Outsiders</div>
                         <div class="pub-item green" data-id="14"><div class="pub-number">★</div><div class="pub-name">O'Mearas Irish Pub</div><div class="checkbox">✓</div></div>
@@ -557,157 +147,114 @@
                         <div class="pub-item green" data-id="18"><div class="pub-number">★</div><div class="pub-name">Paternoster</div><div class="checkbox">✓</div></div>
                     </div>
                 </div>
-                
-                <button class="reset-button" id="resetBtn">↻ Reset Progress</button>
+                <button class="reset-button" id="resetBtn" type="button">↻ Reset Progress</button>
             </div>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
     <script>
-        // Password protection
-        const PASSWORD = 'zootjeongeregeld2026';
+        let pubs = [], markers = {}, completed = [], mapInitialized = false;
         
-        function checkPassword() {
+        window.checkPassword = function() {
+            const PASSWORD = 'zootjeongeregeld2026';
             const passwordInput = document.getElementById('passwordInput').value;
             const errorMessage = document.getElementById('errorMessage');
-            
             if (passwordInput === PASSWORD) {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('app').style.display = 'flex';
                 sessionStorage.setItem('boelBoelAuth', 'true');
-                initializeMap();
+                window.initializeMap();
             } else {
                 errorMessage.style.display = 'block';
                 document.getElementById('passwordInput').value = '';
                 document.getElementById('passwordInput').focus();
             }
-        }
+        };
         
-        document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') checkPassword();
+        window.triggerConfetti = function() {
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 }
+            });
+            setTimeout(() => {
+                confetti({
+                    particleCount: 50,
+                    spread: 100,
+                    origin: { y: 0.6 }
+                });
+            }, 300);
+        };
+        
+        window.toggleMapFullscreen = function() {
+            const mapDiv = document.getElementById('map');
+            const container = document.getElementById('app');
+            const btn = document.getElementById('fullscreenBtn');
+            if (mapDiv.classList.contains('fullscreen')) {
+                mapDiv.classList.remove('fullscreen');
+                container.classList.remove('fullscreen-mode');
+                btn.classList.remove('exit');
+            } else {
+                mapDiv.classList.add('fullscreen');
+                container.classList.add('fullscreen-mode');
+                btn.classList.add('exit');
+            }
+            setTimeout(() => {
+                if (window.mapInstance) window.mapInstance.invalidateSize(true);
+            }, 100);
+        };
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') window.checkPassword();
+            });
+            
+            // Setup reset button
+            const resetBtn = document.getElementById('resetBtn');
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    completed = [];
+                    localStorage.setItem('boelBoelCompleted', JSON.stringify(completed));
+                    
+                    // Update all markers
+                    if (mapInitialized && pubs.length > 0) {
+                        pubs.forEach(pub => {
+                            if (markers[pub.id]) {
+                                const icon = L.divIcon({
+                                    html: `<div style="background-color: ${pub.color}; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 3px solid white; box-shadow: 0 3px 12px rgba(0,0,0,0.3); font-family: 'Fredoka One';">${pub.id}</div>`,
+                                    iconSize: [40, 40]
+                                });
+                                markers[pub.id].setIcon(icon);
+                                const popupContent = `<div><h3 style="color: ${pub.color};">${pub.id}. ${pub.name}</h3><p><strong>Area:</strong> <span style="color: ${pub.color};">${pub.area.toUpperCase()}</span></p><p><strong>Status:</strong> <span style="color: #F44336;">Not visited</span></p><div style="margin-top: 10px;"><button data-pubid="${pub.id}" class="mark-complete-btn" style="width: 100%; padding: 8px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Mark Complete</button></div></div>`;
+                                markers[pub.id].setPopupContent(popupContent);
+                            }
+                        });
+                    }
+                    
+                    // Update UI
+                    document.getElementById('completed').textContent = '0/13';
+                    document.getElementById('remaining').textContent = '13';
+                    document.getElementById('percentage').textContent = '0%';
+                    document.querySelector('.progress-bar').style.width = '0%';
+                    
+                    document.querySelectorAll('.pub-item').forEach(item => {
+                        item.classList.remove('completed');
+                    });
+                });
+            }
         });
         
-        if (sessionStorage.getItem('boelBoelAuth') === 'true') {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('app').style.display = 'flex';
-            window.addEventListener('load', initializeMap);
-        }
-        
-        // Map initialization
-        let mapInitialized = false;
-        let pubs = [];
-        let markers = {};
-        let completed = [];
-        
-        function getPopupContent(pub) {
-            const isCompleted = completed.includes(pub.id);
-            return `<div><h3 style="color: ${pub.color}; margin-bottom: 8px;">${pub.id}. ${pub.name}</h3><p><strong>Area:</strong> <span style="color: ${pub.color}; font-weight: 600;">${pub.area.toUpperCase()}</span></p><p><strong>Status:</strong> <span style="color: ${isCompleted ? '#4CAF50' : '#F44336'}; font-weight: 600;">${isCompleted ? '✓ Completed' : 'Not visited'}</span></p><div style="margin-top: 10px;"><button onclick="togglePubAndUpdate(${pub.id})" style="width: 100%; padding: 8px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600;">${isCompleted ? 'Unmark' : 'Mark Complete'}</button></div></div>`;
-        }
-        
-        function togglePubAndUpdate(id) {
-            togglePub(id);
-            // Update the popup with new content
-            const pub = pubs.find(p => p.id === id);
-            if (markers[id]) {
-                markers[id].setPopupContent(getPopupContent(pub));
-            }
-        }
-        
-        function toggleMapFullscreen() {
-            const overlay = document.getElementById('fullscreenOverlay');
-            const mapDiv = document.getElementById('map');
-            const mapFullscreen = document.getElementById('mapFullscreen');
-            const sidebar = document.querySelector('.sidebar');
-            const header = document.querySelector('.header');
-            
-            if (overlay.classList.contains('active')) {
-                // Exit fullscreen
-                overlay.classList.remove('active');
-                header.style.display = 'flex';
-                sidebar.style.display = 'flex';
-                document.body.style.overflow = 'hidden';
-                mapDiv.style.display = 'flex';
-            } else {
-                // Enter fullscreen
-                overlay.classList.add('active');
-                header.style.display = 'none';
-                sidebar.style.display = 'none';
-                document.body.style.overflow = 'hidden';
-                mapDiv.style.display = 'none';
-            }
-            
-            // Trigger map resize
-            setTimeout(() => {
-                if (window.mapInstance) {
-                    window.mapInstance.invalidateSize(true);
-                }
-            }, 100);
-        }
-        
-        function togglePub(id) {
-            const index = completed.indexOf(id);
-            if (index > -1) {
-                completed.splice(index, 1);
-            } else {
-                completed.push(id);
-            }
-            localStorage.setItem('boelBoelCompleted', JSON.stringify(completed));
-            updateUI();
-            
-            const pub = pubs.find(p => p.id === id);
-            if (markers[id]) {
-                markers[id].setIcon(createIcon(pub));
-                setTimeout(() => markers[id].openPopup(), 100);
-            }
-        }
-        
-        function createIcon(pub) {
-            const isCompleted = completed.includes(pub.id);
-            const bgColor = isCompleted ? '#4CAF50' : pub.color;
-            const icon = isCompleted ? '✓' : pub.id;
-            
-            return L.divIcon({
-                html: `<div style="background-color: ${bgColor}; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 3px solid white; box-shadow: 0 3px 12px rgba(0,0,0,0.3); font-family: 'Fredoka One';">${icon}</div>`,
-                iconSize: [40, 40],
-                className: 'leaflet-marker-icon'
-            });
-        }
-        
-        function updateUI() {
-            const requiredPubs = pubs.filter(p => p.required);
-            const requiredCompleted = completed.filter(id => pubs.find(p => p.id === id && p.required)).length;
-            const bonusCompleted = completed.filter(id => pubs.find(p => p.id === id && !p.required)).length;
-            const remainingCount = requiredPubs.length - requiredCompleted;
-            const percentage = Math.round((requiredCompleted / requiredPubs.length) * 100);
-            
-            document.getElementById('completed').textContent = `${requiredCompleted}/${requiredPubs.length}${bonusCompleted > 0 ? ` +${bonusCompleted}` : ''}`;
-            document.getElementById('remaining').textContent = remainingCount;
-            document.getElementById('percentage').textContent = percentage + '%';
-            document.querySelector('.progress-bar').style.width = Math.min(percentage, 100) + '%';
-
-            document.querySelectorAll('.pub-item').forEach(item => {
-                const id = parseInt(item.dataset.id);
-                if (completed.includes(id)) {
-                    item.classList.add('completed');
-                } else {
-                    item.classList.remove('completed');
-                }
-            });
-        }
-        
-        function initializeMap() {
+        window.initializeMap = function() {
             if (mapInitialized) return;
             mapInitialized = true;
-            
-            const map = L.map('map', { preferCanvas: true }).setView([51.6884, 5.3048], 15);
+            const map = L.map('map').setView([51.6884, 5.3048], 15);
             window.mapInstance = map;
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap', maxZoom: 19 }).addTo(map);
             
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '© OpenStreetMap',
-                maxZoom: 19
-            }).addTo(map);
-
             pubs = [
                 { id: 1, name: 'Reinders', lat: 51.689658892634846, lng: 5.300710010940677, area: 'red', color: '#E63946', required: true },
                 { id: 2, name: 'Het Veulen', lat: 51.68977209647595, lng: 5.300141446566025, area: 'red', color: '#E63946', required: true },
@@ -728,42 +275,97 @@
                 { id: 17, name: 'Hello my Friend!', lat: 51.689839348996884, lng: 5.3007707436085205, area: 'green', color: '#32CD32', required: false },
                 { id: 18, name: 'Paternoster', lat: 51.68906730633433, lng: 5.303330878792206, area: 'green', color: '#32CD32', required: false }
             ];
-
+            
             completed = JSON.parse(localStorage.getItem('boelBoelCompleted')) || [];
-
-            pubs.forEach((pub) => {
+            
+            function createIcon(pub) {
+                const isCompleted = completed.includes(pub.id);
+                const bgColor = isCompleted ? '#4CAF50' : pub.color;
+                const icon = isCompleted ? '✓' : pub.id;
+                return L.divIcon({
+                    html: `<div style="background-color: ${bgColor}; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 3px solid white; box-shadow: 0 3px 12px rgba(0,0,0,0.3); font-family: 'Fredoka One';">${icon}</div>`,
+                    iconSize: [40, 40]
+                });
+            }
+            
+            pubs.forEach(pub => {
                 const marker = L.marker([pub.lat, pub.lng], { icon: createIcon(pub) }).addTo(map);
                 markers[pub.id] = marker;
-                
                 const isCompleted = completed.includes(pub.id);
-                marker.bindPopup(getPopupContent(pub));
-            });
-
-            document.querySelectorAll('.pub-item').forEach(item => {
-                item.addEventListener('click', () => {
-                    const id = parseInt(item.dataset.id);
-                    togglePub(id);
-                    // Update the marker popup if it exists
-                    if (markers[id]) {
-                        const pub = pubs.find(p => p.id === id);
-                        markers[id].setPopupContent(getPopupContent(pub));
-                    }
+                const popupContent = `<div><h3 style="color: ${pub.color};">${pub.id}. ${pub.name}</h3><p><strong>Area:</strong> <span style="color: ${pub.color};">${pub.area.toUpperCase()}</span></p><p><strong>Status:</strong> <span style="color: ${isCompleted ? '#4CAF50' : '#F44336'};">${isCompleted ? '✓ Completed' : 'Not visited'}</span></p><div style="margin-top: 10px;"><button data-pubid="${pub.id}" class="mark-complete-btn" style="width: 100%; padding: 8px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">${isCompleted ? 'Unmark' : 'Mark Complete'}</button></div></div>`;
+                marker.bindPopup(popupContent, {
+                    closeButton: true,
+                    autoClose: false
                 });
             });
-
-            document.getElementById('resetBtn').addEventListener('click', () => {
-                if (confirm('Reset all progress?')) {
-                    completed = [];
-                    localStorage.setItem('boelBoelCompleted', JSON.stringify(completed));
-                    updateUI();
-                }
+            
+            document.querySelectorAll('.pub-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    window.togglePub(parseInt(this.dataset.id));
+                });
             });
-
+            
+            // Event delegation for popup buttons - use document level
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.classList.contains('mark-complete-btn')) {
+                    const pubId = parseInt(e.target.getAttribute('data-pubid'));
+                    window.togglePub(pubId);
+                }
+            }, true);
+            
             const allBounds = L.latLngBounds(pubs.map(p => [p.lat, p.lng]));
             map.fitBounds(allBounds, { padding: [50, 50] });
+            window.updateUI();
+        };
+        
+        window.togglePub = function(id) {
+            const index = completed.indexOf(id);
+            if (index > -1) {
+                completed.splice(index, 1);
+            } else {
+                completed.push(id);
+            }
+            localStorage.setItem('boelBoelCompleted', JSON.stringify(completed));
+            window.updateUI();
+            if (markers[id]) {
+                const pub = pubs.find(p => p.id === id);
+                const isCompleted = completed.includes(id);
+                
+                const bgColor = isCompleted ? '#4CAF50' : pub.color;
+                const icon = isCompleted ? '✓' : pub.id;
+                markers[id].setIcon(L.divIcon({
+                    html: `<div style="background-color: ${bgColor}; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 18px; border: 3px solid white; box-shadow: 0 3px 12px rgba(0,0,0,0.3); font-family: 'Fredoka One';">${icon}</div>`,
+                    iconSize: [40, 40]
+                }));
+                
+                const popupContent = `<div><h3 style="color: ${pub.color};">${pub.id}. ${pub.name}</h3><p><strong>Area:</strong> <span style="color: ${pub.color};">${pub.area.toUpperCase()}</span></p><p><strong>Status:</strong> <span style="color: ${isCompleted ? '#4CAF50' : '#F44336'};">${isCompleted ? '✓ Completed' : 'Not visited'}</span></p><div style="margin-top: 10px;"><button data-pubid="${pub.id}" class="mark-complete-btn" style="width: 100%; padding: 8px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">${isCompleted ? 'Unmark' : 'Mark Complete'}</button></div></div>`;
+                markers[id].setPopupContent(popupContent);
+            }
+        };
+        
+        window.updateUI = function() {
+            const requiredPubs = pubs.filter(p => p.required);
+            const requiredCompleted = completed.filter(id => pubs.find(p => p.id === id && p.required)).length;
+            const bonusCompleted = completed.filter(id => pubs.find(p => p.id === id && !p.required)).length;
+            const percentage = Math.round((requiredCompleted / requiredPubs.length) * 100);
+            document.getElementById('completed').textContent = `${requiredCompleted}/${requiredPubs.length}${bonusCompleted > 0 ? ` +${bonusCompleted}` : ''}`;
+            document.getElementById('remaining').textContent = requiredPubs.length - requiredCompleted;
+            document.getElementById('percentage').textContent = percentage + '%';
+            document.querySelector('.progress-bar').style.width = Math.min(percentage, 100) + '%';
+            document.querySelectorAll('.pub-item').forEach(item => {
+                const id = parseInt(item.dataset.id);
+                if (completed.includes(id)) {
+                    item.classList.add('completed');
+                } else {
+                    item.classList.remove('completed');
+                }
+            });
             
-            updateUI();
-        }
+            // Trigger confetti when all required pubs are completed
+            if (requiredCompleted === requiredPubs.length && requiredCompleted > 0) {
+                window.triggerConfetti();
+            }
+        };
     </script>
 </body>
 </html>
